@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, MapPin, Users, Music, Star } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Music, Star, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-dance.jpg";
 
@@ -35,7 +35,8 @@ const Index = () => {
             <img
               src="/logo.png"
               alt="Workshop de Dança - Excelência em Movimento"
-              className="w-full max-w-[900px] max-h-[60vh] object-contain mx-auto mb-8 drop-shadow-2xl"
+              className="w-full max-w-[900px] max-h-[60vh] object-contain mx-auto mb-8 drop-shadow-2xl cursor-default"
+              onClick={() => navigate("/admin")}
             />
 
           </motion.div>
@@ -123,6 +124,23 @@ const Index = () => {
             <Button variant="hero" size="lg" className="px-12 py-6 text-lg" onClick={() => navigate("/inscricao")}>
               Inscrever-se
             </Button>
+
+            <div className="mt-12 space-y-4">
+              <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                <MapPin className="w-5 h-5 text-gold" />
+                <span>Rua monte castelo, 354 - rib. das neves</span>
+              </div>
+
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  className="gap-2 border-gold/30 hover:bg-gold/10 text-primary"
+                  onClick={() => window.open("https://www.instagram.com/batistafe.oficial/", "_blank")}
+                >
+                  <Instagram className="w-5 h-5" /> @batistafe.oficial
+                </Button>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
