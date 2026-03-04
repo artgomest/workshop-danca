@@ -31,14 +31,19 @@ const Index = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="flex flex-col items-center"
           >
+            <img
+              src="/logo-igreja.png"
+              alt="Igreja Batista da Fé"
+              className="w-24 h-auto mb-4 -rotate-90 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate("/admin")}
+            />
             <img
               src="/logo.png"
               alt="Workshop de Dança - Excelência em Movimento"
-              className="w-full max-w-[900px] max-h-[60vh] object-contain mx-auto mb-8 drop-shadow-2xl cursor-default"
-              onClick={() => navigate("/admin")}
+              className="w-full max-w-[900px] max-h-[60vh] object-contain mx-auto mb-8 drop-shadow-2xl"
             />
-
           </motion.div>
 
           <motion.div
