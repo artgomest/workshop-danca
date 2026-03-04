@@ -36,7 +36,7 @@ const Index = () => {
             <img
               src="/logo-igreja.png"
               alt="Igreja Batista da Fé"
-              className="w-24 h-auto mb-4 -rotate-90 cursor-pointer hover:opacity-80 transition-opacity"
+              className="w-24 h-auto mb-4 cursor-pointer hover:opacity-80 transition-opacity"
               onDoubleClick={() => navigate("/admin")}
             />
             <img
@@ -152,7 +152,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="py-8 px-4 bg-primary text-center">
-        <p className="text-pearl/60 text-sm">© 2026 Igreja Batista Fé – Congresso de Dança</p>
+        <p className="text-pearl/60 text-sm">© 2026 Igreja Batista Fé – Workshop de Dança</p>
       </footer>
     </div>
   );
