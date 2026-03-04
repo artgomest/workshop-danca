@@ -4,6 +4,7 @@ CREATE TABLE public.registrations (
   nome TEXT NOT NULL,
   telefone TEXT NOT NULL,
   igreja TEXT NOT NULL,
+  almoco BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
