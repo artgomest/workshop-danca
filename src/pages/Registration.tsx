@@ -38,6 +38,26 @@ const Registration = () => {
     };
 
     fetchVacancies();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel("registration-count-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "registrations",
+        },
+        () => {
+          fetchVacancies();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const initParticipants = () => {

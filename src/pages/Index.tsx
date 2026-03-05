@@ -33,6 +33,26 @@ const Index = () => {
     };
 
     fetchVacancies();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel("schema-db-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "registrations",
+        },
+        () => {
+          fetchVacancies();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
