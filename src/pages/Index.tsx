@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Clock, MapPin, Users, Music, Star, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-dance.jpg";
@@ -17,6 +19,21 @@ const scheduleItems = [
 
 const Index = () => {
   const navigate = useNavigate();
+  const [vacancies, setVacancies] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchVacancies = async () => {
+      const { count, error } = await supabase
+        .from("registrations")
+        .select("*", { count: "exact", head: true });
+
+      if (!error && count !== null) {
+        setVacancies(Math.max(0, 50 - count));
+      }
+    };
+
+    fetchVacancies();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,7 +71,7 @@ const Index = () => {
           >
             <span className="flex items-center gap-2"><Calendar className="w-5 h-5 text-gold" /> 25 de Abril de 2026</span>
             <span className="flex items-center gap-2"><Clock className="w-5 h-5 text-gold" /> 08:00 às 18:30</span>
-            <span className="flex items-center gap-2"><Users className="w-5 h-5 text-gold" /> 50 vagas</span>
+            <span className="flex items-center gap-2"><Users className="w-5 h-5 text-gold" /> {vacancies !== null ? `${vacancies} vagas restantes` : "Carregando vagas..."}</span>
           </motion.div>
 
           <motion.div

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, CheckCircle2, Copy } from "lucide-react";
@@ -24,8 +24,27 @@ const Registration = () => {
   const [churchName, setChurchName] = useState("");
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [vacancies, setVacancies] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchVacancies = async () => {
+      const { count, error } = await supabase
+        .from("registrations")
+        .select("*", { count: "exact", head: true });
+
+      if (!error && count !== null) {
+        setVacancies(Math.max(0, 50 - count));
+      }
+    };
+
+    fetchVacancies();
+  }, []);
 
   const initParticipants = () => {
+    if (vacancies !== null && quantity > vacancies) {
+      toast.error(`Desculpe, restam apenas ${vacancies} vagas.`);
+      return;
+    }
     setParticipants(Array.from({ length: quantity }, () => ({ nome: "", telefone: "", igreja: "", almoco: false })));
     setStep("form");
   };
@@ -97,7 +116,11 @@ const Registration = () => {
             <div className="bg-card border border-border rounded-xl p-8 md:p-12 shadow-sm">
               <p className="text-gold font-body tracking-[0.2em] uppercase text-xs mb-3">Passo 1</p>
               <h2 className="font-display text-3xl font-bold text-foreground mb-2">Quantos ingressos?</h2>
-              <p className="text-muted-foreground mb-8 text-sm">Selecione a quantidade de participantes</p>
+              <p className="text-muted-foreground mb-8 text-sm">
+                {vacancies !== null
+                  ? `Restam ${vacancies} vagas disponíveis`
+                  : "Carregando vagas..."}
+              </p>
 
               <div className="flex items-center justify-center gap-6 mb-10">
                 <button
