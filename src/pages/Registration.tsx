@@ -208,15 +208,20 @@ const Registration = () => {
                           />
                         </div>
                       )}
-                      <div className="flex items-center gap-3 pt-2">
-                        <Checkbox
-                          id={`almoco-${i}`}
-                          checked={p.almoco}
-                          onCheckedChange={(checked) => updateParticipant(i, "almoco", checked === true)}
-                        />
-                        <Label htmlFor={`almoco-${i}`} className="text-sm cursor-pointer text-foreground">
-                          Deseja almoçar no evento?
-                        </Label>
+                      <div className="flex flex-col gap-2 pt-2">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            id={`almoco-${i}`}
+                            checked={p.almoco}
+                            onCheckedChange={(checked) => updateParticipant(i, "almoco", checked === true)}
+                          />
+                          <Label htmlFor={`almoco-${i}`} className="text-sm cursor-pointer text-foreground">
+                            Deseja almoçar no evento? (+ R$ 15,00)
+                          </Label>
+                        </div>
+                        <p className="text-xs text-muted-foreground ml-7 w-[90%] md:w-full">
+                          Cardápio: Arroz, strogonoff de frango, batata palha e salada.
+                        </p>
                       </div>
                     </div>
                   </motion.div>
@@ -264,7 +269,8 @@ const Registration = () => {
                     onClick={async () => {
                       setIsSubmitting(true);
                       try {
-                        const totalValue = calculateTotal(quantity);
+                        const extraLunchCost = participants.filter(p => p.almoco).length * 15;
+                        const totalValue = calculateTotal(quantity) + extraLunchCost;
                         
                         const response = await fetch("/api/create-preference", {
                           method: "POST",
