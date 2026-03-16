@@ -1,12 +1,14 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/workshop-danca",
-      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/"
+      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/",
+      "permanent": false
     },
     {
       "source": "/workshop-danca/:path*",
-      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/:path*"
+      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/:path*",
+      "permanent": false
     }
   ]
 }
