@@ -1,14 +1,5 @@
 {
   "rewrites": [
-    {
-      "source": "/workshop-danca/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.igrejabatistafe.com.br"
-        }
-      ],
-      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/:path*"
-    }
+    { "source": "/workshop-danca/:path*", "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/:path*" }
   ]
 }
