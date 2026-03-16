@@ -1,14 +1,14 @@
 {
-  "redirects": [
-    {
-      "source": "/workshop-danca",
-      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/",
-      "permanent": false
-    },
+  "rewrites": [
     {
       "source": "/workshop-danca/:path*",
-      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/:path*",
-      "permanent": false
+      "has": [
+        {
+          "type": "host",
+          "value": "www.igrejabatistafe.com.br"
+        }
+      ],
+      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/:path*"
     }
   ]
 }
