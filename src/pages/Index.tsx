@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, MapPin, Users, Music, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-dance.jpg";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const scheduleItems = [
   { time: "08:00 - 08:30", title: "Credenciamento", icon: Users },
@@ -17,6 +19,23 @@ const scheduleItems = [
 
 const Index = () => {
   const navigate = useNavigate();
+  const [vagasDisponiveis, setVagasDisponiveis] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchVagas = async () => {
+      // Faz a contagem de quantos inscritos já temos lá no banco (cada linha salva é 1 ingresso/pessoa)
+      const { count, error } = await supabase
+        .from("registrations")
+        .select("*", { count: "exact", head: true });
+
+      if (!error && count !== null) {
+        // Subtrai o total de inscritos do limite de 50 vagas, mas nunca deixa ficar negativo
+        setVagasDisponiveis(Math.max(0, 50 - count));
+      }
+    };
+
+    fetchVagas();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,7 +67,10 @@ const Index = () => {
           >
             <span className="flex items-center gap-2"><Calendar className="w-5 h-5 text-gold" /> 25 de Abril de 2026</span>
             <span className="flex items-center gap-2"><Clock className="w-5 h-5 text-gold" /> 08:00 às 18:30</span>
-            <span className="flex items-center gap-2"><Users className="w-5 h-5 text-gold" /> 50 vagas</span>
+            <span className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-gold" />
+              {vagasDisponiveis !== null ? `${vagasDisponiveis} vagas` : "..."}
+            </span>
           </motion.div>
 
           <motion.div
