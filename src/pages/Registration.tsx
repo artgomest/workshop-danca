@@ -142,9 +142,19 @@ const Registration = () => {
         {/* Step: Form */}
         {step === "form" && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="bg-card border border-border rounded-xl p-6 md:p-10 shadow-sm">
-              <p className="text-gold font-body tracking-[0.2em] uppercase text-xs mb-3">Passo 2</p>
-              <h2 className="font-display text-3xl font-bold text-foreground mb-6">Dados dos Participantes</h2>
+            <div className="bg-card border border-border rounded-xl p-6 md:p-10 shadow-sm relative">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                  <p className="text-gold font-body tracking-[0.2em] uppercase text-xs mb-3">Passo 2</p>
+                  <h2 className="font-display text-3xl font-bold text-foreground">Dados dos Participantes</h2>
+                </div>
+                <div className="bg-pearl/30 border border-gold/30 rounded-lg py-2 px-4 shadow-sm text-right">
+                  <p className="text-muted-foreground text-xs uppercase tracking-[0.1em] font-semibold mb-1">Valor Atualizado</p>
+                  <p className="text-xl font-display font-bold text-gold">
+                    R$ {(calculateTotal(quantity) + participants.filter(p => p.almoco).length * 15).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
 
               <div className="flex items-center gap-3 mb-6 p-4 bg-nude/50 rounded-lg border border-border">
                 <Checkbox
