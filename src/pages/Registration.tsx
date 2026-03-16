@@ -242,40 +242,34 @@ const Registration = () => {
               >
                 <CheckCircle2 className="w-20 h-20 text-gold mx-auto mb-6" />
               </motion.div>
-              <h2 className="font-display text-3xl font-bold text-foreground mb-3">Inscrição Confirmada!</h2>
+              <h2 className="font-display text-3xl font-bold text-foreground mb-3">Pré-inscrição Registrada!</h2>
               <p className="text-muted-foreground mb-8">
-                {quantity} participante{quantity > 1 ? "s" : ""} inscrito{quantity > 1 ? "s" : ""} com sucesso.
+                Seus dados foram salvos com sucesso.
               </p>
 
               <div className="bg-pearl/50 border border-gold/40 rounded-xl p-6 mb-8 shadow-sm text-center max-w-lg mx-auto">
-                <h3 className="font-display font-bold text-lg mb-3 text-primary">Aviso Muito Importante! ⚠️</h3>
+                <h3 className="font-display font-bold text-lg mb-3 text-primary">Próximo passo: Pagamento ⚠️</h3>
                 <p className="text-sm text-foreground/90 leading-relaxed">
-                  Todas as orientações, dicas de preparação, cronograma detalhado e avisos importantes serão enviados <strong>exclusivamente</strong> pelo grupo VIP do WhatsApp. É fundamental que <strong>todos os inscritos</strong> entrem para não ficarem de fora de nenhuma informação crucial do evento!
+                  Para finalizar e garantir sua vaga, você precisa efetuar o pagamento. Ao clicar no botão abaixo, você será redirecionado(a) para uma das nossas atendentes que irá confirmar os dados e te explicar como realizar o pagamento!
                 </p>
               </div>
 
               <div className="mb-10 flex flex-col items-center">
-                {quantity > 1 && (
-                  <p className="text-sm font-medium text-foreground bg-gold/10 text-gold-gradient p-3 rounded-lg border border-gold/30 mb-4 max-w-md">
-                    Importante: Como você inscreveu mais de uma pessoa, por favor, compartilhe o link do grupo com elas!
-                  </p>
-                )}
                 <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
                   <Button
-                    className="w-full sm:w-auto bg-[#25D366] hover:bg-[#128C7E] text-white gap-2 text-base md:text-lg py-6 px-6 shadow-lg shadow-[#25D366]/20 transition-all hover:scale-105"
-                    onClick={() => window.open("https://chat.whatsapp.com/FZRXeMNX73167SGM5bFKfT", "_blank")}
-                  >
-                    Entrar no Grupo do WhatsApp
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full sm:w-auto gap-2 text-base md:text-lg py-6 px-6"
+                    className="w-full sm:w-auto bg-[#25D366] hover:bg-[#128C7E] text-white gap-2 text-base md:text-lg py-6 px-8 shadow-lg shadow-[#25D366]/20 transition-all hover:scale-105"
                     onClick={() => {
-                      navigator.clipboard.writeText("https://chat.whatsapp.com/FZRXeMNX73167SGM5bFKfT");
-                      toast.success("Link copiado! Agora é só enviar para o pessoal.");
+                      const totalValue = calculateTotal(quantity);
+                      const formattedValue = totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+                      const wppMessage = `Olá! Gostaria de finalizar o pagamento da minha inscrição para o Workshop Excelência em Movimento.%0A%0A*Ingressos:* ${quantity}%0A*Valor Total:* R$ ${formattedValue}%0A%0A*Participantes:*%0A${participants.map(p => `- ${p.nome}`).join('%0A')}`;
+
+                      // Número oficial de atendimento do evento
+                      const wppNumber = "5531992030973";
+                      window.open(`https://wa.me/${wppNumber}?text=${wppMessage}`, "_blank");
                     }}
                   >
-                    <Copy className="w-5 h-5" /> Copiar Link
+                    Finalizar Inscrição no WhatsApp
                   </Button>
                 </div>
               </div>
