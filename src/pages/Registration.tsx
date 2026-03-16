@@ -109,6 +109,7 @@ const Registration = () => {
 
               <div className="flex items-center justify-center gap-6 mb-8">
                 <button
+                  type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-12 h-12 rounded-full border-2 border-gold flex items-center justify-center text-gold hover:bg-gold hover:text-primary transition-colors"
                 >
@@ -116,6 +117,7 @@ const Registration = () => {
                 </button>
                 <span className="text-6xl font-display font-bold text-foreground w-20 text-center">{quantity}</span>
                 <button
+                  type="button"
                   onClick={() => setQuantity(Math.min(50, quantity + 1))}
                   className="w-12 h-12 rounded-full border-2 border-gold flex items-center justify-center text-gold hover:bg-gold hover:text-primary transition-colors"
                 >
