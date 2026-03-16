@@ -14,6 +14,7 @@ interface Registration {
   telefone: string;
   igreja: string;
   almoco: boolean;
+  status_pagamento?: string;
   created_at: string;
 }
 
@@ -60,10 +61,11 @@ const Admin = () => {
         Telefone: r.telefone,
         Igreja: r.igreja,
         "Vai almoçar?": r.almoco ? "Sim" : "Não",
+        "Pagamento": r.status_pagamento === "aprovado" ? "Aprovado" : "Pendente",
         "Data Inscrição": new Date(r.created_at).toLocaleString("pt-BR"),
       }))
     );
-    ws["!cols"] = [{ wch: 5 }, { wch: 35 }, { wch: 18 }, { wch: 30 }, { wch: 15 }, { wch: 20 }];
+    ws["!cols"] = [{ wch: 5 }, { wch: 35 }, { wch: 18 }, { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 20 }];
     XLSX.utils.book_append_sheet(wb, ws, "Inscrições");
     XLSX.writeFile(wb, "inscricoes-workshop-danca.xlsx");
   };
@@ -126,6 +128,7 @@ const Admin = () => {
                   <TableHead>Telefone</TableHead>
                   <TableHead>Igreja</TableHead>
                   <TableHead>Almoço</TableHead>
+                  <TableHead>Pagamento</TableHead>
                   <TableHead>Data</TableHead>
                 </TableRow>
               </TableHeader>
@@ -139,6 +142,11 @@ const Admin = () => {
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${r.almoco ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         {r.almoco ? "Sim" : "Não"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${r.status_pagamento === 'aprovado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {r.status_pagamento === 'aprovado' ? "Aprovado" : "Pendente"}
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">

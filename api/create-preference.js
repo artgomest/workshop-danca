@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { totalValue, quantity, description, participants } = req.body;
+    const { totalValue, quantity, description, participants, external_reference } = req.body;
 
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
@@ -20,6 +20,8 @@ export default async function handler(req, res) {
             unit_price: Number(totalValue)
           }
         ],
+        external_reference: external_reference, // Vincula o ID da primeira inscrição para o Webhook achar depois
+        notification_url: "https://workshop.igrejabatistafe.com.br/api/mp-webhook", // Endpoint de escuta
         back_urls: {
           success: "https://workshop.igrejabatistafe.com.br/",
           failure: "https://workshop.igrejabatistafe.com.br/",

@@ -38,6 +38,8 @@ const Registration = () => {
     });
   };
 
+  const [registeredIds, setRegisteredIds] = useState<string[]>([]);
+
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
     if (digits.length <= 2) return digits;
@@ -62,15 +64,20 @@ const Registration = () => {
     }
 
     setIsSubmitting(true);
-    const { error } = await supabase.from("registrations").insert(finalParticipants);
+    const { data: insertedData, error } = await supabase
+        .from("registrations")
+        .insert(finalParticipants)
+        .select('id');
+        
     setIsSubmitting(false);
 
-    if (error) {
+    if (error || !insertedData) {
       toast.error("Erro ao salvar inscrição. Tente novamente.");
       console.error(error);
       return;
     }
 
+    setRegisteredIds(insertedData.map(row => row.id));
     setStep("success");
     toast.success("Inscrição realizada com sucesso!");
   };
@@ -291,7 +298,8 @@ const Registration = () => {
                             totalValue,
                             quantity,
                             description: `Inscrições - Workshop Excelência em Movimento`,
-                            participants: participants
+                            participants: participants,
+                            external_reference: registeredIds[0]
                           })
                         });
 
