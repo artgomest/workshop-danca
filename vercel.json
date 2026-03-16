@@ -1,8 +1,5 @@
 {
   "rewrites": [
-    {
-      "source": "/workshop-danca/:path*",
-      "destination": "/:path*"
-    }
+    { "source": "/workshop-danca/:path*", "destination": "/:path*" }
   ]
 }
