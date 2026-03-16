@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, MapPin, Users, Music, Star } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Music, Star, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-dance.jpg";
 import { useState, useEffect } from "react";
@@ -50,7 +50,14 @@ const Index = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="flex flex-col items-center"
           >
+            <img
+              src="/logo-igreja.png"
+              alt="Igreja Batista da Fé"
+              className="w-24 h-auto mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+              onDoubleClick={() => navigate("/admin")}
+            />
             <img
               src="/logo.png"
               alt="Workshop de Dança - Excelência em Movimento"
@@ -145,13 +152,30 @@ const Index = () => {
             <Button variant="hero" size="lg" className="px-12 py-6 text-lg" onClick={() => navigate("/inscricao")}>
               Inscrever-se
             </Button>
+
+            <div className="mt-12 space-y-4">
+              <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                <MapPin className="w-5 h-5 text-gold" />
+                <span>Rua monte castelo, 354 - rib. das neves</span>
+              </div>
+
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  className="gap-2 border-gold/30 hover:bg-gold/10 text-primary"
+                  onClick={() => window.open("https://www.instagram.com/batistafe.oficial/", "_blank")}
+                >
+                  <Instagram className="w-5 h-5" /> @batistafe.oficial
+                </Button>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="py-8 px-4 bg-primary text-center">
-        <p className="text-pearl/60 text-sm">© 2026 Igreja Batista da Fé – Congresso de Dança</p>
+        <p className="text-pearl/60 text-sm">© 2026 Igreja Batista Fé – Workshop de Dança</p>
       </footer>
     </div>
   );
