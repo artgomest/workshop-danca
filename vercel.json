@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/workshop-danca",
+      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/"
+    },
+    {
+      "source": "/workshop-danca/:path*",
+      "destination": "https://workshop-danca-3k4b19hyx-artgomests-projects.vercel.app/:path*"
+    }
+  ]
+}
