@@ -1,0 +1,43 @@
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+
+  try {
+    const { totalValue, quantity, description, participants } = req.body;
+
+    const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer APP_USR-8354303606767691-031609-f4a553f2ce9da5a30a793f13ed9e63f3-3269966505`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        items: [
+          {
+            title: description || "Inscrição - Workshop de Dança IBF",
+            quantity: 1, // Passamos a quantidade como 1 porque já calculamos o valor total globalizado com desconto
+            unit_price: Number(totalValue)
+          }
+        ],
+        back_urls: {
+          success: "https://workshop.igrejabatistafe.com.br/",
+          failure: "https://workshop.igrejabatistafe.com.br/",
+          pending: "https://workshop.igrejabatistafe.com.br/"
+        },
+        auto_return: "approved"
+      })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error("MP Error:", errorText);
+        return res.status(500).json({ error: "Failed to create preference from Mercado Pago" });
+    }
+
+    const data = await response.json();
+    return res.status(200).json({ init_point: data.init_point });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}

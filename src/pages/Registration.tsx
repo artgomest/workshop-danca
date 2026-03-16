@@ -250,28 +250,50 @@ const Registration = () => {
               </p>
 
               <div className="bg-pearl/50 border border-gold/40 rounded-xl p-6 mb-8 shadow-sm text-center max-w-lg mx-auto">
-                <h3 className="font-display font-bold text-lg mb-3 text-primary">Próximo passo: Pagamento ⚠️</h3>
+                <h3 className="font-display font-bold text-lg mb-3 text-primary">Próximo passo: Pagamento 💳</h3>
                 <p className="text-sm text-foreground/90 leading-relaxed">
-                  Para finalizar e garantir sua vaga, você precisa efetuar o pagamento. Ao clicar no botão abaixo, você será redirecionado(a) para uma das nossas atendentes que irá confirmar os dados e te explicar como realizar o pagamento!
+                  Para finalizar e garantir sua vaga, você precisa efetuar o pagamento seguro na nossa maquininha online do Mercado Pago. Aceitamos Pix, Boleto ou Cartão!
                 </p>
               </div>
 
               <div className="mb-10 flex flex-col items-center">
                 <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
                   <Button
-                    className="w-full sm:w-auto bg-[#25D366] hover:bg-[#128C7E] text-white gap-2 text-base md:text-lg py-6 px-8 shadow-lg shadow-[#25D366]/20 transition-all hover:scale-105"
-                    onClick={() => {
-                      const totalValue = calculateTotal(quantity);
-                      const formattedValue = totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    className="w-full sm:w-auto bg-[#009EE3] hover:bg-[#007EBD] text-white gap-2 text-base md:text-lg py-6 px-8 shadow-lg shadow-[#009EE3]/20 transition-all hover:scale-105"
+                    disabled={isSubmitting}
+                    onClick={async () => {
+                      setIsSubmitting(true);
+                      try {
+                        const totalValue = calculateTotal(quantity);
+                        
+                        const response = await fetch("/api/create-preference", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json"
+                          },
+                          body: JSON.stringify({
+                            totalValue,
+                            quantity,
+                            description: `Inscrições - Workshop Excelência em Movimento`,
+                            participants: participants
+                          })
+                        });
 
-                      const wppMessage = `Olá! Gostaria de finalizar o pagamento da minha inscrição para o Workshop Excelência em Movimento.%0A%0A*Ingressos:* ${quantity}%0A*Valor Total:* R$ ${formattedValue}%0A%0A*Participantes:*%0A${participants.map(p => `- ${p.nome}`).join('%0A')}`;
-
-                      // Número oficial de atendimento do evento
-                      const wppNumber = "5531992030973";
-                      window.open(`https://wa.me/${wppNumber}?text=${wppMessage}`, "_blank");
+                        const data = await response.json();
+                        if (data.init_point) {
+                          // Redireciona para o Checkout Pro do Mercado Pago
+                          window.location.href = data.init_point;
+                        } else {
+                          toast.error("Erro ao gerar pagamento. Tente novamente.");
+                        }
+                      } catch (error) {
+                        toast.error("Erro ao conectar com servidor de pagamentos.");
+                      } finally {
+                        setIsSubmitting(false);
+                      }
                     }}
                   >
-                    Finalizar Inscrição no WhatsApp
+                    {isSubmitting ? "Gerando link seguro..." : "Pagar Inscrição Agora"}
                   </Button>
                 </div>
               </div>
