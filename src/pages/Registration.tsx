@@ -83,11 +83,14 @@ const Registration = () => {
   };
 
   const calculateTotal = (qtd: number) => {
-    if (qtd >= 10) return qtd * 75;
-    if (qtd >= 8) return qtd * 80;
-    if (qtd >= 5) return qtd * 85;
-    if (qtd >= 3) return qtd * 90;
-    return qtd * 100;
+    // TESTE: valor fixo de R$10 por pessoa
+    return qtd * 10;
+    // ORIGINAL (descomentar depois do teste):
+    // if (qtd >= 10) return qtd * 75;
+    // if (qtd >= 8) return qtd * 80;
+    // if (qtd >= 5) return qtd * 85;
+    // if (qtd >= 3) return qtd * 90;
+    // return qtd * 100;
   };
 
   return (
