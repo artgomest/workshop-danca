@@ -23,7 +23,7 @@ export default async function handler(req, res) {
         external_reference: external_reference, // Vincula o ID da primeira inscrição para o Webhook achar depois
         notification_url: "https://workshop.igrejabatistafe.com.br/api/mp-webhook", // Endpoint de escuta
         back_urls: {
-          success: "https://workshop.igrejabatistafe.com.br/",
+          success: "https://workshop.igrejabatistafe.com.br/sucesso",
           failure: "https://workshop.igrejabatistafe.com.br/",
           pending: "https://workshop.igrejabatistafe.com.br/"
         },

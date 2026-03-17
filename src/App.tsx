@@ -8,6 +8,8 @@ import Registration from "./pages/Registration";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
+import PaymentSuccess from "./pages/PaymentSuccess";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -20,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/inscricao" element={<Registration />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/sucesso" element={<PaymentSuccess />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
