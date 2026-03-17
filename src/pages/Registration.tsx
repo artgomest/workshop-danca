@@ -44,6 +44,7 @@ const Registration = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [pixData, setPixData] = useState<{ qr_code: string; qr_code_base64: string } | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [currentRef, setCurrentRef] = useState<string | null>(null);
 
   // Polling: verifica se o Pix foi pago a cada 5 segundos
   useEffect(() => {
@@ -75,11 +76,15 @@ const Registration = () => {
   };
 
   const handleSubmit = async () => {
+    const payment_ref = crypto.randomUUID();
+    setCurrentRef(payment_ref);
+
     const finalParticipants = participants.map((p) => ({
       nome: p.nome,
       telefone: p.telefone,
       igreja: sameChurch ? churchName : p.igreja,
       almoco: p.almoco,
+      ref_pagamento: payment_ref
     }));
 
     for (let i = 0; i < finalParticipants.length; i++) {
@@ -120,7 +125,7 @@ const Registration = () => {
           quantity,
           description: "Inscrições - Workshop Excelência em Movimento",
           participants,
-          external_reference: ids[0] || "sem-ref"
+          external_reference: payment_ref
         })
       });
       const data = await response.json();
@@ -369,7 +374,10 @@ const Registration = () => {
                         const response = await fetch("/api/process-payment", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify(formData),
+                          body: JSON.stringify({
+                            ...formData,
+                            external_reference: currentRef
+                          }),
                         });
                         const result = await response.json();
 

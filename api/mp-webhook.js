@@ -26,7 +26,7 @@ export default async function handler(req, res) {
            const ref = paymentData.external_reference;
 
            if(ref) {
-              const supabaseResponse = await fetch(`${process.env.VITE_SUPABASE_URL}/rest/v1/registrations?id=eq.${ref}`, {
+              const supabaseResponse = await fetch(`${process.env.VITE_SUPABASE_URL}/rest/v1/registrations?ref_pagamento=eq.${ref}`, {
                 method: 'PATCH',
                 headers: {
                   'apikey': process.env.VITE_SUPABASE_PUBLISHABLE_KEY,

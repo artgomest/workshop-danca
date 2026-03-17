@@ -17,6 +17,25 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+
+    // Se aprovado, já atualiza o banco de dados imediatamente (backup do webhook)
+    if (data.status === 'approved' && data.external_reference) {
+      try {
+        await fetch(`${process.env.VITE_SUPABASE_URL}/rest/v1/registrations?ref_pagamento=eq.${data.external_reference}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${process.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ status_pagamento: 'aprovado' })
+        });
+      } catch (dbError) {
+        console.error("Erro ao atualizar DB no process-payment:", dbError);
+      }
+    }
+
     return res.status(response.status).json(data);
   } catch (error) {
     console.error("Payment error:", error);
