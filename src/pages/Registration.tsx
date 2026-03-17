@@ -410,7 +410,7 @@ const Registration = () => {
                   <p className="text-muted-foreground text-sm mb-3">Abra o app do seu banco e escaneie:</p>
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
                     <p className="text-sm font-semibold text-amber-900">Destinatário: Arthur Gomes Esteves</p>
-                    <p className="text-xs text-amber-700">Líder da nossa igreja</p>
+                    <p className="text-xs text-amber-700">Líder de mídia da IBF</p>
                   </div>
                   <img
                     src={`data:image/png;base64,${pixData.qr_code_base64}`}
