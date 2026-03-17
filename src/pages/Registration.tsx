@@ -19,7 +19,7 @@ interface Participant {
 
 const Registration = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState<"quantity" | "form" | "payment" | "paid">("quantity");
+  const [step, setStep] = useState<"quantity" | "form" | "payment" | "confirming" | "paid">("quantity");
   const [quantity, setQuantity] = useState(1);
   const [sameChurch, setSameChurch] = useState(false);
   const [churchName, setChurchName] = useState("");
@@ -349,7 +349,8 @@ const Registration = () => {
 
                         if (result.status === "approved") {
                           toast.success("Pagamento aprovado! 🎉");
-                          setStep("paid");
+                          setStep("confirming");
+                          setTimeout(() => setStep("paid"), 2500);
                         } else if (result.status === "pending" || result.status === "in_process") {
                           // Pix: capturar QR Code da resposta e mostrar na tela
                           const txData = result.point_of_interaction?.transaction_data;
@@ -415,6 +416,47 @@ const Registration = () => {
                 <Button variant="ghost" onClick={() => navigate("/")}>Voltar ao Início</Button>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* Step: Confirming (animated check) */}
+        {step === "confirming" && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            className="flex flex-col items-center justify-center py-20"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            >
+              <div className="w-32 h-32 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-green-200/50">
+                <motion.div
+                  initial={{ scale: 0, rotate: -90 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                >
+                  <CheckCircle2 className="w-16 h-16 text-green-600" />
+                </motion.div>
+              </div>
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 10 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              transition={{ delay: 0.5 }}
+              className="font-display text-3xl font-bold text-foreground"
+            >
+              Pagamento Aprovado!
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              transition={{ delay: 0.8 }}
+              className="text-muted-foreground mt-2"
+            >
+              Redirecionando...
+            </motion.p>
           </motion.div>
         )}
 
