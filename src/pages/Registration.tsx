@@ -292,6 +292,8 @@ const Registration = () => {
                         const extraLunchCost = participants.filter(p => p.almoco).length * 15;
                         const totalValue = calculateTotal(quantity) + extraLunchCost;
                         
+                        console.log("Enviando para API:", { totalValue, quantity, external_reference: registeredIds[0] });
+                        
                         const response = await fetch("/api/create-preference", {
                           method: "POST",
                           headers: {
@@ -302,18 +304,21 @@ const Registration = () => {
                             quantity,
                             description: `Inscrições - Workshop Excelência em Movimento`,
                             participants: participants,
-                            external_reference: registeredIds[0]
+                            external_reference: registeredIds[0] || "sem-ref"
                           })
                         });
 
+                        console.log("Status da resposta:", response.status);
                         const data = await response.json();
+                        console.log("Resposta da API:", data);
+                        
                         if (data.init_point) {
-                          // Redireciona para o Checkout Pro do Mercado Pago
                           window.location.href = data.init_point;
                         } else {
-                          toast.error("Erro ao gerar pagamento. Tente novamente.");
+                          toast.error("Erro ao gerar pagamento: " + JSON.stringify(data));
                         }
                       } catch (error) {
+                        console.error("Erro completo:", error);
                         toast.error("Erro ao conectar com servidor de pagamentos.");
                       } finally {
                         setIsSubmitting(false);
