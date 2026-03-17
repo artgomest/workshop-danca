@@ -43,6 +43,29 @@ const Registration = () => {
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
   const [pixData, setPixData] = useState<{ qr_code: string; qr_code_base64: string } | null>(null);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
+
+  // Polling: verifica se o Pix foi pago a cada 5 segundos
+  useEffect(() => {
+    if (!paymentId || step !== "payment") return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/check-payment?id=${paymentId}`);
+        const data = await res.json();
+        if (data.status === "approved") {
+          clearInterval(interval);
+          toast.success("Pagamento aprovado! 🎉");
+          setStep("confirming");
+          setTimeout(() => setStep("paid"), 2500);
+        }
+      } catch (e) {
+        console.error("Erro ao verificar pagamento:", e);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [paymentId, step]);
 
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -119,8 +142,8 @@ const Registration = () => {
   };
 
   const calculateTotal = (qtd: number) => {
-    // TESTE: valor fixo de R$10 por pessoa
-    return qtd * 10;
+    // TESTE: valor fixo de R$1 por pessoa
+    return qtd * 1;
     // ORIGINAL (descomentar depois do teste):
     // if (qtd >= 10) return qtd * 75;
     // if (qtd >= 8) return qtd * 80;
@@ -352,7 +375,8 @@ const Registration = () => {
                           setStep("confirming");
                           setTimeout(() => setStep("paid"), 2500);
                         } else if (result.status === "pending" || result.status === "in_process") {
-                          // Pix: capturar QR Code da resposta e mostrar na tela
+                          // Pix: capturar QR Code e paymentId da resposta
+                          if (result.id) setPaymentId(String(result.id));
                           const txData = result.point_of_interaction?.transaction_data;
                           if (txData?.qr_code_base64 && txData?.qr_code) {
                             setPixData({

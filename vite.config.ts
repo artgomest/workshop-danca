@@ -95,6 +95,30 @@ export default defineConfig(({ mode }) => ({
             res.end();
           }
         });
+
+        // Proxy para verificar status do pagamento
+        server.middlewares.use('/api/check-payment', async (req, res) => {
+          const url = new URL(req.url!, `http://${req.headers.host}`);
+          const id = url.searchParams.get('id');
+          if (!id) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Missing id' }));
+            return;
+          }
+          try {
+            const response = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
+              headers: {
+                "Authorization": `Bearer APP_USR-900719235341104-031620-7a120dbcfa5939e600723ce62e0dca88-3269966505`
+              }
+            });
+            const data = await response.json();
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ status: data.status }));
+          } catch(err) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: err.message }));
+          }
+        });
       }
     }
   ].filter(Boolean),
