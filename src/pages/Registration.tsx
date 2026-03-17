@@ -42,6 +42,7 @@ const Registration = () => {
   const [registeredIds, setRegisteredIds] = useState<string[]>([]);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [pixData, setPixData] = useState<{ qr_code: string; qr_code_base64: string } | null>(null);
 
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -350,8 +351,15 @@ const Registration = () => {
                           toast.success("Pagamento aprovado! 🎉");
                           setStep("paid");
                         } else if (result.status === "pending" || result.status === "in_process") {
-                          // Pix/Boleto: mantém o Brick na tela mostrando QR Code
-                          toast.info("Pix gerado! Efetue o pagamento para liberar o acesso ao grupo.");
+                          // Pix: capturar QR Code da resposta e mostrar na tela
+                          const txData = result.point_of_interaction?.transaction_data;
+                          if (txData?.qr_code_base64 && txData?.qr_code) {
+                            setPixData({
+                              qr_code: txData.qr_code,
+                              qr_code_base64: txData.qr_code_base64,
+                            });
+                          }
+                          toast.info("Pix gerado! Escaneie o QR Code ou copie o código.");
                         } else {
                           toast.error("Pagamento não aprovado. Tente novamente.");
                         }
@@ -369,6 +377,39 @@ const Registration = () => {
                   />
                 )}
               </div>
+
+              {/* QR Code Pix */}
+              {pixData && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-6 bg-white border-2 border-gold/40 rounded-xl shadow-md max-w-md mx-auto text-center">
+                  <h3 className="font-display font-bold text-lg mb-2 text-foreground">📱 Escaneie o QR Code Pix</h3>
+                  <p className="text-muted-foreground text-sm mb-4">Abra o app do seu banco e escaneie:</p>
+                  <img
+                    src={`data:image/png;base64,${pixData.qr_code_base64}`}
+                    alt="QR Code Pix"
+                    className="w-56 h-56 mx-auto mb-4 rounded-lg border border-border"
+                  />
+                  <p className="text-muted-foreground text-xs mb-2">Ou copie o código Pix:</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={pixData.qr_code}
+                      className="flex-1 text-xs p-2 bg-pearl border border-border rounded-lg truncate"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(pixData.qr_code);
+                        toast.success("Código Pix copiado!");
+                      }}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <p className="text-gold text-xs font-semibold mt-4">Após o pagamento ser confirmado, o acesso ao grupo será liberado automaticamente.</p>
+                </motion.div>
+              )}
 
               <div className="flex gap-4 mt-6 pt-6 border-t border-border/50">
                 <Button variant="ghost" onClick={() => navigate("/")}>Voltar ao Início</Button>
