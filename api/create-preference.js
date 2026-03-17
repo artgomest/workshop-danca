@@ -23,7 +23,7 @@ export default async function handler(req, res) {
         payment_methods: {
           excluded_payment_types: [],
           excluded_payment_methods: [],
-          installments: 1
+          installments: 12
         },
         external_reference: external_reference,
         notification_url: "https://workshop-danca.igrejabatistafe.com.br/api/mp-webhook",
