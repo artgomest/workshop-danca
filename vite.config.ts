@@ -63,6 +63,38 @@ export default defineConfig(({ mode }) => ({
             res.end();
           }
         });
+
+        // Proxy para processar pagamento (Bricks)
+        server.middlewares.use('/api/process-payment', (req, res) => {
+          if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', async () => {
+              try {
+                const paymentData = JSON.parse(body);
+                const response = await fetch("https://api.mercadopago.com/v1/payments", {
+                  method: "POST",
+                  headers: {
+                    "Authorization": `Bearer APP_USR-900719235341104-031620-7a120dbcfa5939e600723ce62e0dca88-3269966505`,
+                    "Content-Type": "application/json",
+                    "X-Idempotency-Key": crypto.randomUUID(),
+                  },
+                  body: JSON.stringify(paymentData)
+                });
+                const data = await response.json();
+                res.setHeader('Content-Type', 'application/json');
+                res.statusCode = response.status;
+                res.end(JSON.stringify(data));
+              } catch(err) {
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: err.message }));
+              }
+            });
+          } else {
+            res.statusCode = 405;
+            res.end();
+          }
+        });
       }
     }
   ].filter(Boolean),

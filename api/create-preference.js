@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    return res.status(200).json({ init_point: data.init_point });
+    return res.status(200).json({ init_point: data.init_point, preference_id: data.id });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

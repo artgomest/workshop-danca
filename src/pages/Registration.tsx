@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, CheckCircle2, Copy } from "lucide-react";
+import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,7 +19,7 @@ interface Participant {
 
 const Registration = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState<"quantity" | "form" | "success">("quantity");
+  const [step, setStep] = useState<"quantity" | "form" | "payment" | "paid">("quantity");
   const [quantity, setQuantity] = useState(1);
   const [sameChurch, setSameChurch] = useState(false);
   const [churchName, setChurchName] = useState("");
@@ -39,6 +40,8 @@ const Registration = () => {
   };
 
   const [registeredIds, setRegisteredIds] = useState<string[]>([]);
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -68,18 +71,50 @@ const Registration = () => {
         .from("registrations")
         .insert(finalParticipants)
         .select('id');
-        
-    setIsSubmitting(false);
 
     if (error || !insertedData) {
+      setIsSubmitting(false);
       toast.error("Erro ao salvar inscrição. Tente novamente.");
       console.error(error);
       return;
     }
 
-    setRegisteredIds(insertedData.map(row => row.id));
-    setStep("success");
-    toast.success("Inscrição realizada com sucesso!");
+    const ids = insertedData.map(row => row.id);
+    setRegisteredIds(ids);
+
+    // Calcular total e criar preferência do MP
+    const extraLunchCost = participants.filter(p => p.almoco).length * 15;
+    const total = calculateTotal(quantity) + extraLunchCost;
+    setTotalAmount(total);
+
+    try {
+      const response = await fetch("/api/create-preference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          totalValue: total,
+          quantity,
+          description: "Inscrições - Workshop Excelência em Movimento",
+          participants,
+          external_reference: ids[0] || "sem-ref"
+        })
+      });
+      const data = await response.json();
+      if (data.preference_id) {
+        // Inicializar SDK e ir para o step de pagamento
+        initMercadoPago("APP_USR-5370f99b-2603-489a-be85-703a1cec3385", { locale: "pt-BR" });
+        setPreferenceId(data.preference_id);
+        setStep("payment");
+        toast.success("Dados salvos! Agora finalize o pagamento.");
+      } else {
+        toast.error("Erro ao preparar pagamento.");
+      }
+    } catch (err) {
+      console.error("Erro ao criar preferência:", err);
+      toast.error("Erro ao conectar com servidor de pagamentos.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculateTotal = (qtd: number) => {
@@ -258,8 +293,93 @@ const Registration = () => {
           </motion.div>
         )}
 
-        {/* Step: Success */}
-        {step === "success" && (
+        {/* Step: Payment (Checkout Bricks) */}
+        {step === "payment" && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="bg-card border border-border rounded-xl p-6 md:p-10 shadow-sm">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                  <p className="text-gold font-body tracking-[0.2em] uppercase text-xs mb-3">Passo 3</p>
+                  <h2 className="font-display text-3xl font-bold text-foreground">Pagamento Seguro</h2>
+                </div>
+                <div className="bg-pearl/30 border border-gold/30 rounded-lg py-2 px-4 shadow-sm text-right">
+                  <p className="text-muted-foreground text-xs uppercase tracking-[0.1em] font-semibold mb-1">Total</p>
+                  <p className="text-xl font-display font-bold text-gold">
+                    R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-muted-foreground text-sm mb-6">
+                Escolha sua forma de pagamento abaixo. Aceitamos Pix, Boleto e Cartão de Crédito.
+              </p>
+
+              <div id="payment-brick-container">
+                {preferenceId && (
+                  <Payment
+                    initialization={{
+                      amount: totalAmount,
+                      preferenceId: preferenceId,
+                    }}
+                    customization={{
+                      paymentMethods: {
+                        creditCard: "all",
+                        debitCard: "all",
+                        ticket: "all",
+                        bankTransfer: "all",
+                        maxInstallments: 12,
+                      },
+                      visual: {
+                        style: {
+                          customVariables: {
+                            formBackgroundColor: "#FDFBF7",
+                            baseColor: "#C6A55C",
+                          }
+                        }
+                      }
+                    }}
+                    onSubmit={async ({ formData }) => {
+                      try {
+                        const response = await fetch("/api/process-payment", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify(formData),
+                        });
+                        const result = await response.json();
+
+                        if (result.status === "approved") {
+                          toast.success("Pagamento aprovado!");
+                          setStep("paid");
+                        } else if (result.status === "pending" || result.status === "in_process") {
+                          toast.success("Pagamento em processamento! Assim que for confirmado, você receberá o link.");
+                          setStep("paid");
+                        } else {
+                          toast.error("Pagamento não aprovado. Tente novamente.");
+                        }
+                      } catch (error) {
+                        console.error("Erro no pagamento:", error);
+                        toast.error("Erro ao processar pagamento.");
+                      }
+                    }}
+                    onError={(error) => {
+                      console.error("Brick error:", error);
+                    }}
+                    onReady={() => {
+                      console.log("Payment Brick pronto");
+                    }}
+                  />
+                )}
+              </div>
+
+              <div className="flex gap-4 mt-6 pt-6 border-t border-border/50">
+                <Button variant="ghost" onClick={() => navigate("/")}>Voltar ao Início</Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Step: Paid (Success) */}
+        {step === "paid" && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
             <div className="bg-card border border-border rounded-xl p-10 md:p-16 shadow-sm">
               <motion.div
@@ -267,75 +387,36 @@ const Registration = () => {
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
               >
-                <CheckCircle2 className="w-20 h-20 text-gold mx-auto mb-6" />
+                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle2 className="w-12 h-12 text-green-600" />
+                </div>
               </motion.div>
-              <h2 className="font-display text-3xl font-bold text-foreground mb-3">Pré-inscrição Registrada!</h2>
+              <h2 className="font-display text-3xl font-bold text-foreground mb-3">Inscrição Confirmada!</h2>
               <p className="text-muted-foreground mb-8">
-                Seus dados foram salvos com sucesso.
+                Seu pagamento foi recebido. Sua vaga no <strong className="text-gold">Workshop Excelência em Movimento</strong> está garantida!
               </p>
 
-              <div className="bg-pearl/50 border border-gold/40 rounded-xl p-6 mb-8 shadow-sm text-center max-w-lg mx-auto">
-                <h3 className="font-display font-bold text-lg mb-3 text-primary">Próximo passo: Pagamento 💳</h3>
-                <p className="text-sm text-foreground/90 leading-relaxed">
-                  Para finalizar e garantir sua vaga, você precisa efetuar o pagamento seguro na nossa maquininha online do Mercado Pago. Aceitamos Pix, Boleto ou Cartão!
+              <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-xl p-6 mb-10 text-center max-w-lg mx-auto relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-[#25D366]"></div>
+                <h3 className="font-display font-bold text-xl mb-3 text-foreground">📢 Último passo!</h3>
+                <p className="text-sm text-foreground/80 mb-6 leading-relaxed">
+                  Entre no nosso grupo exclusivo para receber os avisos oficiais, horários e informações sobre o Workshop.
                 </p>
-              </div>
-
-              <div className="mb-10 flex flex-col items-center">
-                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
-                  <Button
-                    className="w-full sm:w-auto bg-[#009EE3] hover:bg-[#007EBD] text-white gap-2 text-base md:text-lg py-6 px-8 shadow-lg shadow-[#009EE3]/20 transition-all hover:scale-105"
-                    disabled={isSubmitting}
-                    onClick={async () => {
-                      setIsSubmitting(true);
-                      try {
-                        const extraLunchCost = participants.filter(p => p.almoco).length * 15;
-                        const totalValue = calculateTotal(quantity) + extraLunchCost;
-                        
-                        console.log("Enviando para API:", { totalValue, quantity, external_reference: registeredIds[0] });
-                        
-                        const response = await fetch("/api/create-preference", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json"
-                          },
-                          body: JSON.stringify({
-                            totalValue,
-                            quantity,
-                            description: `Inscrições - Workshop Excelência em Movimento`,
-                            participants: participants,
-                            external_reference: registeredIds[0] || "sem-ref"
-                          })
-                        });
-
-                        console.log("Status da resposta:", response.status);
-                        const data = await response.json();
-                        console.log("Resposta da API:", data);
-                        
-                        if (data.init_point) {
-                          window.location.href = data.init_point;
-                        } else {
-                          toast.error("Erro ao gerar pagamento: " + JSON.stringify(data));
-                        }
-                      } catch (error) {
-                        console.error("Erro completo:", error);
-                        toast.error("Erro ao conectar com servidor de pagamentos.");
-                      } finally {
-                        setIsSubmitting(false);
-                      }
-                    }}
-                  >
-                    {isSubmitting ? "Gerando link seguro..." : "Pagar Inscrição Agora"}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 pt-6 border-t border-border/50">
-                <Button variant="ghost" onClick={() => navigate("/")}>Voltar ao Início</Button>
-                <Button variant="gold" onClick={() => { setStep("quantity"); setQuantity(1); }}>
-                  Nova Inscrição
+                <Button
+                  size="lg"
+                  className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white gap-2 py-6 text-lg font-bold shadow-lg shadow-[#25D366]/20 transition-all hover:scale-[1.02]"
+                  onClick={() => window.open("https://chat.whatsapp.com/FZRXeMNX73167SGM5bFKfT", "_blank")}
+                >
+                  Entrar no Grupo do Workshop
                 </Button>
               </div>
+
+              <button
+                onClick={() => navigate("/")}
+                className="text-sm font-semibold text-muted-foreground hover:text-gold transition-colors underline underline-offset-4"
+              >
+                Voltar ao início
+              </button>
             </div>
           </motion.div>
         )}
