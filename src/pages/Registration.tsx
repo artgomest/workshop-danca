@@ -338,12 +338,15 @@ const Registration = () => {
                 Escolha sua forma de pagamento abaixo. Aceitamos Pix, Boleto e Cartão de Crédito.
               </p>
 
-              <div id="payment-brick-container">
+              <div id="payment-brick-container" className={pixData ? "hidden" : "block"}>
                 {preferenceId && (
                   <Payment
                     initialization={{
                       amount: totalAmount,
                       preferenceId: preferenceId,
+                      payer: {
+                        email: "inscricao@igrejabatistafe.com.br", // E-mail padrão para evitar prompt
+                      }
                     }}
                     customization={{
                       paymentMethods: {
@@ -437,6 +440,14 @@ const Registration = () => {
                     </Button>
                   </div>
                   <p className="text-gold text-xs font-semibold mt-4">Após o pagamento ser confirmado, o acesso ao grupo será liberado automaticamente.</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="mt-4 text-xs"
+                    onClick={() => setPixData(null)}
+                  >
+                    Alterar forma de pagamento
+                  </Button>
                 </motion.div>
               )}
 
