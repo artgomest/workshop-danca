@@ -25,22 +25,17 @@ export default async function handler(req, res) {
       const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://ywbnkaetpwixvkyeoyue.supabase.co';
       const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bnFrYWV0cHdpeHZreWVveXVlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjY0ODA2MSwiZXhwIjoyMDg4MjI0MDYxfQ.vGeP4IBABDDMR7nIUXhsqTgydGhvKzM81HN51jblDC4';
 
-      console.log("Check-Payment: Detectou aprovação. Atualizando DB para ref:", ref);
-
       try {
-        const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?ref_pagamento=eq.${ref}`, {
+        await fetch(`${supabaseUrl}/rest/v1/registrations?ref_pagamento=eq.${ref}`, {
           method: 'PATCH',
           headers: {
             'apikey': supabaseServiceKey,
             'Authorization': `Bearer ${supabaseServiceKey}`,
             'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
+            'Prefer': 'return=minimal'
           },
           body: JSON.stringify({ status_pagamento: 'aprovado' })
         });
-        const resultText = await supabaseResponse.text();
-        console.log("Check-Payment Supabase Status:", supabaseResponse.status);
-        console.log("Check-Payment Supabase Result:", resultText);
       } catch (dbError) {
         console.error("Erro ao atualizar DB no check-payment:", dbError);
       }

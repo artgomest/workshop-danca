@@ -5,7 +5,6 @@ export default async function handler(req, res) {
 
   try {
     const payment = req.body;
-    console.log("Webhook Body:", JSON.stringify(payment));
 
     const paymentId = payment.data ? payment.data.id : payment.id;
     if (!paymentId && payment.type !== 'payment') {
@@ -21,15 +20,11 @@ export default async function handler(req, res) {
     });
 
     const paymentData = await response.json();
-    console.log("Payment Data Status:", paymentData.status);
-    console.log("External Reference:", paymentData.external_reference);
 
     if (paymentData.status === 'approved' && paymentData.external_reference) {
         const ref = paymentData.external_reference;
         const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://ywbnkaetpwixvkyeoyue.supabase.co';
         const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bnFrYWV0cHdpeHZreWVveXVlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjY0ODA2MSwiZXhwIjoyMDg4MjI0MDYxfQ.vGeP4IBABDDMR7nIUXhsqTgydGhvKzM81HN51jblDC4';
-
-        console.log("Tentando atualizar Supabase para ref:", ref);
 
         const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?ref_pagamento=eq.${ref}`, {
             method: 'PATCH',
@@ -45,8 +40,6 @@ export default async function handler(req, res) {
         });
 
         const resultText = await supabaseResponse.text();
-        console.log("Supabase Status:", supabaseResponse.status);
-        console.log("Supabase Result:", resultText);
 
         if (!supabaseResponse.ok) {
             console.error("Erro ao atualizar Supabase via webhook:", resultText);
