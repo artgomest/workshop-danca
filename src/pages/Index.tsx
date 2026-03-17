@@ -42,8 +42,8 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Dançarinos em movimento" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 navy-gradient opacity-70" />
+          <img src="/hero-background.jpg" alt="Dançarinos em movimento" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 navy-gradient opacity-60" />
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <motion.div
