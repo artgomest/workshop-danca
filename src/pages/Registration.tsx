@@ -325,7 +325,6 @@ const Registration = () => {
                       paymentMethods: {
                         creditCard: "all",
                         debitCard: "all",
-                        ticket: "all",
                         bankTransfer: "all",
                         maxInstallments: 12,
                       },
