@@ -407,7 +407,11 @@ const Registration = () => {
               {pixData && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-6 bg-white border-2 border-gold/40 rounded-xl shadow-md max-w-md mx-auto text-center">
                   <h3 className="font-display font-bold text-lg mb-2 text-foreground">📱 Escaneie o QR Code Pix</h3>
-                  <p className="text-muted-foreground text-sm mb-4">Abra o app do seu banco e escaneie:</p>
+                  <p className="text-muted-foreground text-sm mb-3">Abra o app do seu banco e escaneie:</p>
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                    <p className="text-sm font-semibold text-amber-900">Destinatário: Arthur Gomes Esteves</p>
+                    <p className="text-xs text-amber-700">Líder da nossa igreja</p>
+                  </div>
                   <img
                     src={`data:image/png;base64,${pixData.qr_code_base64}`}
                     alt="QR Code Pix"
