@@ -26,20 +26,20 @@ export default async function handler(req, res) {
           installments: 12
         },
         external_reference: external_reference,
-        notification_url: "https://workshop.igrejabatistafe.com.br/api/mp-webhook",
+        notification_url: "https://workshop-danca.igrejabatistafe.com.br/api/mp-webhook",
         back_urls: {
-          success: "https://workshop.igrejabatistafe.com.br/sucesso",
-          failure: "https://workshop.igrejabatistafe.com.br/",
-          pending: "https://workshop.igrejabatistafe.com.br/"
+          success: "https://workshop-danca.igrejabatistafe.com.br/sucesso",
+          failure: "https://workshop-danca.igrejabatistafe.com.br/",
+          pending: "https://workshop-danca.igrejabatistafe.com.br/"
         },
         auto_return: "approved"
       })
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        console.error("MP Error:", errorText);
-        return res.status(500).json({ error: "Failed to create preference from Mercado Pago" });
+      const errorText = await response.text();
+      console.error("MP Error:", errorText);
+      return res.status(500).json({ error: "Failed to create preference from Mercado Pago" });
     }
 
     const data = await response.json();
