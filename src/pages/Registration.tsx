@@ -348,11 +348,11 @@ const Registration = () => {
                         const result = await response.json();
 
                         if (result.status === "approved") {
-                          toast.success("Pagamento aprovado!");
+                          toast.success("Pagamento aprovado! 🎉");
                           setStep("paid");
                         } else if (result.status === "pending" || result.status === "in_process") {
-                          toast.success("Pagamento em processamento! Assim que for confirmado, você receberá o link.");
-                          setStep("paid");
+                          // Pix/Boleto: mantém o Brick na tela mostrando QR Code
+                          toast.info("Pix gerado! Efetue o pagamento para liberar o acesso ao grupo.");
                         } else {
                           toast.error("Pagamento não aprovado. Tente novamente.");
                         }
