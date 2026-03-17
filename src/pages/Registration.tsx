@@ -535,6 +535,38 @@ const Registration = () => {
                 >
                   Entrar no Grupo do Workshop
                 </Button>
+
+                {participants.length > 1 && (
+                  <div className="mt-8 pt-6 border-t border-[#25D366]/20">
+                    <p className="text-sm font-semibold text-foreground mb-4">
+                      📍 Você inscreveu {participants.length} pessoas. Compartilhe o link do grupo com os outros participantes:
+                    </p>
+                    <div className="flex flex-col gap-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-2 border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/5"
+                        onClick={() => {
+                          const message = encodeURIComponent(`Olá! Realizei nossa inscrição para o Workshop de Dança IBF. Segue o link do grupo oficial: https://chat.whatsapp.com/FZRXeMNX73167SGM5bFKfT`);
+                          window.open(`https://wa.me/?text=${message}`, "_blank");
+                        }}
+                      >
+                        Compartilhar via WhatsApp
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full gap-2 text-muted-foreground"
+                        onClick={() => {
+                          navigator.clipboard.writeText("https://chat.whatsapp.com/FZRXeMNX73167SGM5bFKfT");
+                          toast.success("Link do grupo copiado!");
+                        }}
+                      >
+                        <Copy className="w-4 h-4" /> Copiar Link
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button
