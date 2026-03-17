@@ -16,12 +16,17 @@ export default async function handler(req, res) {
         items: [
           {
             title: description || "Inscrição - Workshop de Dança IBF",
-            quantity: 1, // Passamos a quantidade como 1 porque já calculamos o valor total globalizado com desconto
+            quantity: 1,
             unit_price: Number(totalValue)
           }
         ],
-        external_reference: external_reference, // Vincula o ID da primeira inscrição para o Webhook achar depois
-        notification_url: "https://workshop.igrejabatistafe.com.br/api/mp-webhook", // Endpoint de escuta
+        payment_methods: {
+          excluded_payment_types: [],
+          excluded_payment_methods: [],
+          installments: 12
+        },
+        external_reference: external_reference,
+        notification_url: "https://workshop.igrejabatistafe.com.br/api/mp-webhook",
         back_urls: {
           success: "https://workshop.igrejabatistafe.com.br/sucesso",
           failure: "https://workshop.igrejabatistafe.com.br/",
