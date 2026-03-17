@@ -17,20 +17,30 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    console.log("Process-Payment MP Result Status:", data.status);
 
     // Se aprovado, já atualiza o banco de dados imediatamente (backup do webhook)
     if (data.status === 'approved' && data.external_reference) {
+      const ref = data.external_reference;
+      const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+      const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+      console.log("Process-Payment: Tentando atualizar DB para ref:", ref);
+
       try {
-        await fetch(`${process.env.VITE_SUPABASE_URL}/rest/v1/registrations?ref_pagamento=eq.${data.external_reference}`, {
+        const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?ref_pagamento=eq.${ref}`, {
           method: 'PATCH',
           headers: {
-            'apikey': process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            'Authorization': `Bearer ${process.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
             'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
+            'Prefer': 'return=representation'
           },
           body: JSON.stringify({ status_pagamento: 'aprovado' })
         });
+        const resultText = await supabaseResponse.text();
+        console.log("Process-Payment Supabase Status:", supabaseResponse.status);
+        console.log("Process-Payment Supabase Result:", resultText);
       } catch (dbError) {
         console.error("Erro ao atualizar DB no process-payment:", dbError);
       }
