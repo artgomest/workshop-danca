@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
           method: 'GET',
           headers: {
-            "Authorization": `Bearer APP_USR-8354303606767691-031609-f4a553f2ce9da5a30a793f13ed9e63f3-3269966505`
+            "Authorization": `Bearer APP_USR-900719235341104-031620-7a120dbcfa5939e600723ce62e0dca88-3269966505`
           }
         });
         
