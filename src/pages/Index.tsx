@@ -10,9 +10,9 @@ const scheduleItems = [
   { time: "08:00 - 08:30", title: "Credenciamento", icon: Users },
   { time: "08:30 - 09:00", title: "Café da Manhã", icon: Star },
   { time: "09:00 - 09:30", title: "Abertura / Apresentação / Oração", icon: Music },
-  { time: "10:00 - 11:30", title: "Aula de Contemporâneo", desc: "Profª Shirley – Cia Arca de Dança (Igreja Batista Rios de Vida)", icon: Music },
+  { time: "10:00 - 11:30", title: "Aula de Hip Hop", desc: "Prof. Culu – Cia Companhia dos Anjos", icon: Music },
   { time: "11:30 - 13:00", title: "Intervalo – Almoço", icon: Star },
-  { time: "13:00 - 14:30", title: "Aula de Hip Hop", desc: "Prof. Culu – Cia Companhia dos Anjos", icon: Music },
+  { time: "13:00 - 14:30", title: "Aula de Contemporâneo", desc: "Profª Shirley – Cia Arca de Dança (Igreja Batista Rios de Vida)", icon: Music },
   { time: "14:50 - 16:20", title: "Aula de Dança Louvor", desc: "Professores Flavinho e Fiama", icon: Music },
   { time: "18:30", title: "Encerramento – Culto", desc: "Louvor IBF e Palavra Pr. Flavinho", icon: Star },
 ];
