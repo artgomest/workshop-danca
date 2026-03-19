@@ -223,7 +223,7 @@ const Registration = () => {
                 <div className="bg-pearl/30 border border-gold/30 rounded-lg py-2 px-4 shadow-sm text-right">
                   <p className="text-muted-foreground text-xs uppercase tracking-[0.1em] font-semibold mb-1">Valor Atualizado</p>
                   <p className="text-xl font-display font-bold text-gold">
-                    R$ {(calculateTotal(quantity) + participants.filter(p => p.almoco).length * 15).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    R$ {(calculateTotal(quantity) + participants.filter(p => p.almoco && p.pagarAlmocoAgora).length * 15).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
                 </div>
               </div>
