@@ -154,10 +154,32 @@ const Index = () => {
             </Button>
 
             <div className="mt-12 space-y-4">
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                <MapPin className="w-5 h-5 text-gold" />
-                <span>Rua monte castelo, 354 - rib. das neves</span>
+              {/* Mapa interativo */}
+              <div 
+                className="relative rounded-xl overflow-hidden border border-border shadow-md cursor-pointer group mx-auto max-w-lg"
+                onClick={() => window.open("https://www.google.com/maps/dir/?api=1&destination=Igreja+Batista+da+Fé,+Rua+Monte+Castelo+354+Ribeirão+das+Neves+MG", "_blank")}
+              >
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3749.5!2d-44.0867!3d-19.7667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDQ2JzAwLjEiUyA0NMKwMDUnMTIuMSJX!5e0!3m2!1spt-BR!2sbr!4v1"
+                  width="100%"
+                  height="200"
+                  style={{ border: 0, pointerEvents: "none" }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Localização da Igreja Batista da Fé"
+                />
+                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors flex items-center justify-center">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-gold" />
+                    <span className="text-sm font-semibold text-primary">Abrir no Google Maps</span>
+                  </div>
+                </div>
               </div>
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
+                <MapPin className="w-4 h-4 text-gold" />
+                Rua Monte Castelo, 354 – Ribeirão das Neves/MG
+              </p>
 
               <div className="flex justify-center">
                 <Button
