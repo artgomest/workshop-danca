@@ -15,6 +15,7 @@ interface Participant {
   telefone: string;
   igreja: string;
   almoco: boolean;
+  pagarAlmocoAgora: boolean;
 }
 
 const Registration = () => {
@@ -27,7 +28,7 @@ const Registration = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initParticipants = () => {
-    setParticipants(Array.from({ length: quantity }, () => ({ nome: "", telefone: "", igreja: "", almoco: false })));
+    setParticipants(Array.from({ length: quantity }, () => ({ nome: "", telefone: "", igreja: "", almoco: false, pagarAlmocoAgora: false })));
     setStep("form");
   };
 
@@ -111,9 +112,9 @@ const Registration = () => {
     const ids = insertedData.map(row => row.id);
     setRegisteredIds(ids);
 
-    // Calcular total e criar preferência do MP
-    const extraLunchCost = participants.filter(p => p.almoco).length * 15;
-    const total = calculateTotal(quantity) + extraLunchCost;
+    // Calcular total com almoços que serão pagos agora
+    const lunchCount = participants.filter(p => p.almoco && p.pagarAlmocoAgora).length;
+    const total = calculateTotal(quantity) + (lunchCount * 15);
     setTotalAmount(total);
 
     try {
@@ -294,15 +295,37 @@ const Registration = () => {
                           <Checkbox
                             id={`almoco-${i}`}
                             checked={p.almoco}
-                            onCheckedChange={(checked) => updateParticipant(i, "almoco", checked === true)}
+                            onCheckedChange={(checked) => {
+                              updateParticipant(i, "almoco", checked === true);
+                              if (!checked) updateParticipant(i, "pagarAlmocoAgora", false);
+                            }}
                           />
                           <Label htmlFor={`almoco-${i}`} className="text-sm cursor-pointer text-foreground">
-                            Deseja almoçar no evento? (+ R$ 15,00)
+                            Deseja almoçar no evento? (R$ 15,00)
                           </Label>
                         </div>
-                        <p className="text-xs text-muted-foreground ml-7 w-[90%] md:w-full">
-                          Cardápio: Arroz, strogonoff de frango, batata palha e salada.
-                        </p>
+                        {p.almoco && (
+                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="ml-7 space-y-2">
+                            <p className="text-xs text-muted-foreground">
+                              Cardápio: Arroz, strogonoff de frango, batata palha e salada.
+                            </p>
+                            <div className="flex items-center gap-3 bg-gold/5 border border-gold/20 rounded-lg p-3">
+                              <Checkbox
+                                id={`pagar-almoco-${i}`}
+                                checked={p.pagarAlmocoAgora}
+                                onCheckedChange={(checked) => updateParticipant(i, "pagarAlmocoAgora", checked === true)}
+                              />
+                              <div>
+                                <Label htmlFor={`pagar-almoco-${i}`} className="text-sm cursor-pointer text-foreground">
+                                  Pagar o almoço agora
+                                </Label>
+                                <p className="text-xs text-muted-foreground">
+                                  Se preferir, você pode pagar no dia do evento.
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -328,16 +351,48 @@ const Registration = () => {
                   <p className="text-gold font-body tracking-[0.2em] uppercase text-xs mb-3">Passo 3</p>
                   <h2 className="font-display text-3xl font-bold text-foreground">Pagamento Seguro</h2>
                 </div>
-                <div className="bg-pearl/30 border border-gold/30 rounded-lg py-2 px-4 shadow-sm text-right">
-                  <p className="text-muted-foreground text-xs uppercase tracking-[0.1em] font-semibold mb-1">Total</p>
-                  <p className="text-xl font-display font-bold text-gold">
-                    R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
+              </div>
+
+              {/* Resumo do Pedido */}
+              <div className="bg-pearl/30 border border-gold/30 rounded-xl p-5 mb-6">
+                <h3 className="font-display font-bold text-base text-foreground mb-4">Resumo do Pedido</h3>
+                <div className="space-y-3 text-sm">
+                  {/* Ingressos */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-foreground">{quantity}x Ingresso</span>
+                    <span className="font-semibold text-foreground">R$ {calculateTotal(quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground -mt-1">
+                    R$ {(calculateTotal(quantity) / quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} por pessoa
+                  </div>
+
+                  {/* Almoço (só aparece se alguém marcou pagar agora) */}
+                  {participants.filter(p => p.almoco && p.pagarAlmocoAgora).length > 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-foreground">{participants.filter(p => p.almoco && p.pagarAlmocoAgora).length}x Almoço</span>
+                      <span className="font-semibold text-foreground">R$ {(participants.filter(p => p.almoco && p.pagarAlmocoAgora).length * 15).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
+
+                  {/* Info almoço no dia */}
+                  {participants.filter(p => p.almoco && !p.pagarAlmocoAgora).length > 0 && (
+                    <div className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg p-2">
+                      🍽️ {participants.filter(p => p.almoco && !p.pagarAlmocoAgora).length} almoço(s) será(ão) pago(s) no dia do evento.
+                    </div>
+                  )}
+
+                  {/* Divider + Total */}
+                  <div className="pt-3 border-t border-gold/30 flex justify-between items-center">
+                    <span className="font-display font-bold text-base text-foreground">Total</span>
+                    <span className="font-display font-bold text-xl text-gold">
+                      R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <p className="text-muted-foreground text-sm mb-6">
-                Escolha sua forma de pagamento abaixo. Aceitamos Pix, Boleto e Cartão de Crédito.
+                Escolha sua forma de pagamento abaixo. Aceitamos Pix e Cartão de Crédito.
               </p>
 
               <div id="payment-brick-container" className={pixData ? "hidden" : "block"}>
